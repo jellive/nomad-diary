@@ -2,7 +2,7 @@ import { Colors } from '@/constants/Colors'
 import { useDB } from '@/context/context'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
 import { Appearance, useColorScheme } from 'react-native'
 import styled, { useTheme } from 'styled-components/native'
@@ -62,8 +62,15 @@ export default function Index() {
   const colorScheme = useColorScheme()
   const navigation = useNavigation()
   const realm = useDB()
-  const [feelings, seFeelings] = useState(realm?.objects('Feeling'))
+  const [feelings, setFeelings] = useState(realm?.objects('Feeling'))
   useEffect(() => {
+    feelings?.addListener(() => {
+      console.log('new feeling change')
+      setFeelings(realm?.objects('Feeling'))
+    })
+    return () => {
+      feelings?.removeAllListeners()
+    }
     // const feelings = realm?.objects('Feeling')
     // console.log('feelings', feelings)
     // const happy = feelings?.filtered(`emotion = '🤯'`)
