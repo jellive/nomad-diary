@@ -74,7 +74,9 @@ export default function Write() {
   const onChangeText = (text: string) => setFeelings(text)
   const onEmotionPress = (face: string) => setEmotion(face)
   const onSubmit = () => {
-    if (!(feelings && emotions)) return Alert.alert('Please complete form.')
+    if (!(feelings && selectedEmotion)) {
+      return Alert.alert('Please complete form.')
+    }
 
     realm?.write(() => {
       const feeling = realm.create('Feeling', {
