@@ -24,7 +24,7 @@ const FeelingSchema: Realm.ObjectSchema = {
   primaryKey: '_id'
 }
 
-const Context = React.createContext<Realm | null>(null)
+export const DBContext = React.createContext<Realm | null>(null)
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -59,7 +59,7 @@ export default function RootLayout() {
     return null
   }
   return (
-    <Context.Provider value={realm}>
+    <DBContext.Provider value={realm}>
       <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
         {/* onLayout은 꼭 써줘야 함. */}
         <ThemeProvider
@@ -74,6 +74,6 @@ export default function RootLayout() {
           </Stack>
         </ThemeProvider>
       </View>
-    </Context.Provider>
+    </DBContext.Provider>
   )
 }
