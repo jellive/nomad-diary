@@ -1,6 +1,8 @@
 import { Colors } from '@/constants/Colors'
+import { useDB } from '@/context/context'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from 'expo-router'
+import { useEffect } from 'react'
 import { Appearance, useColorScheme } from 'react-native'
 import styled, { useTheme } from 'styled-components/native'
 
@@ -35,6 +37,8 @@ const BtnText = styled.Text``
 export default function Index() {
   const colorScheme = useColorScheme()
   const navigation = useNavigation()
+  const realm = useDB()
+
   return (
     <View>
       <Title>Home</Title>

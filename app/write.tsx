@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from 'react'
 import { Alert, Appearance, useColorScheme } from 'react-native'
 import styled from 'styled-components/native'
 import { useDB } from '@/context/context'
+import { useNavigation } from 'expo-router'
 
 const colorScheme = Appearance.getColorScheme()
 
@@ -62,15 +63,30 @@ const emotions = ['🤯', '🥲', '🤬', '🤗', '🥰', '😊', '🤩']
 
 export default function Write() {
   const realm = useDB()
-  useEffect(() => console.log('realm', realm), [])
+  useEffect(() => {
+    console.log(realm)
+  }, [])
+
+  const { goBack } = useNavigation()
+
   const [selectedEmotion, setEmotion] = useState<string | null>(null)
   const [feelings, setFeelings] = useState('')
   const onChangeText = (text: string) => setFeelings(text)
   const onEmotionPress = (face: string) => setEmotion(face)
-  console.log(feelings, selectedEmotion)
   const onSubmit = () => {
-    if (!(feelings && emotions)) Alert.alert('Please complete form.')
-    console.log(feelings, selectedEmotion)
+    if (!(feelings && emotions)) return Alert.alert('Please complete form.')
+
+    realm?.write(() => {
+      const feeling = realm.create('Feeling', {
+        _id: Date.now(),
+        emotion: selectedEmotion,
+        message: feelings
+      })
+      console.log(feeling)
+    })
+    setEmotion(null)
+    setFeelings('')
+    goBack()
   }
   return (
     <View>
