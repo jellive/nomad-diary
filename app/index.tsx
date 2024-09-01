@@ -2,11 +2,29 @@ import { Colors } from '@/constants/Colors'
 import { useDB } from '@/context/context'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
-import { FlatList } from 'react-native'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Button, FlatList, Platform } from 'react-native'
 import { Appearance, useColorScheme, LayoutAnimation } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import styled, { useTheme } from 'styled-components/native'
+// ads!
+import {
+  InterstitialAd,
+  AdEventType,
+  TestIds,
+  BannerAd,
+  useForeground,
+  BannerAdSize
+} from 'react-native-google-mobile-ads'
+
+const adUnitId = TestIds.INTERSTITIAL
+
+const adBannerId = TestIds.BANNER
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ['fashion', 'clothing']
+})
+// ads!
 
 const colorScheme = Appearance.getColorScheme()
 
@@ -64,21 +82,57 @@ export default function Index() {
   const navigation = useNavigation()
   const realm = useDB()
   const [feelings, setFeelings] = useState(realm?.objects('Feeling'))
+
+  // ads!
+  // interstitial (전체 가로막기)
+  const [loaded, setLoaded] = useState(false)
   useEffect(() => {
-    feelings?.addListener((feel, changes) => {
-      console.log('new feeling change')
-      // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring) // 상태가 바뀌면 자연스레 바꿔준다.
-      LayoutAnimation.spring() // 이렇게 써도 됨.
-      setFeelings(feel.sorted('_id', false)) // false면 desc, true면 asc
-    })
-    return () => {
-      feelings?.removeAllListeners()
-    }
-    // const feelings = realm?.objects('Feeling')
-    // console.log('feelings', feelings)
-    // const happy = feelings?.filtered(`emotion = '🤯'`)
-    // console.log('happy', happy)
+    const unsubscribe = interstitial.addAdEventListener(
+      AdEventType.LOADED,
+      () => {
+        setLoaded(true)
+      }
+    )
+
+    // Start loading the interstitial straight away
+    interstitial.load()
+
+    // Unsubscribe from events on unmount
+    return unsubscribe
   }, [])
+
+  // banner
+  const bannerRef = useRef<BannerAd>(null)
+  useForeground(() => {
+    Platform.OS === 'ios' && bannerRef.current?.load()
+  })
+
+  const banner =
+    // ads!
+
+    useEffect(() => {
+      feelings?.addListener((feel, changes) => {
+        console.log('new feeling change')
+        // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring) // 상태가 바뀌면 자연스레 바꿔준다.
+        LayoutAnimation.spring() // 이렇게 써도 됨.
+        setFeelings(feel.sorted('_id', false)) // false면 desc, true면 asc
+
+        // ads!
+        interstitial.addAdEventListener(AdEventType.LOADED, () => {
+          interstitial.show()
+        })
+
+        interstitial.load()
+        // ads!
+      })
+      return () => {
+        feelings?.removeAllListeners()
+      }
+      // const feelings = realm?.objects('Feeling')
+      // console.log('feelings', feelings)
+      // const happy = feelings?.filtered(`emotion = '🤯'`)
+      // console.log('happy', happy)
+    }, [])
   const removeFeeling = (id: string) => {
     realm?.write(() => {
       const feeling = realm.objectForPrimaryKey('Feeling', id)
@@ -89,6 +143,13 @@ export default function Index() {
   return (
     <View>
       <Title>Home</Title>
+
+      <BannerAd
+        ref={bannerRef}
+        unitId={adBannerId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
+
       <FlatList
         data={feelings}
         contentContainerStyle={{ paddingVertical: 10 }}
@@ -103,9 +164,19 @@ export default function Index() {
           </TouchableOpacity>
         )}
       />
+
       <Btn onPress={() => navigation.navigate({ name: 'write' })}>
         <Ionicons name="add" color="white" size={40} />
       </Btn>
+
+      {/* ads! */}
+      <Button
+        title="Show Interstitial"
+        onPress={() => {
+          interstitial.show()
+        }}
+      />
+      {/* ads! */}
     </View>
   )
 }
