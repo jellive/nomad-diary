@@ -13,6 +13,7 @@ import Realm from 'realm'
 
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { View } from 'react-native'
+import { DBContext } from '@/context/context'
 
 const FeelingSchema: Realm.ObjectSchema = {
   name: 'Feeling',
@@ -23,8 +24,6 @@ const FeelingSchema: Realm.ObjectSchema = {
   },
   primaryKey: '_id'
 }
-
-export const DBContext = React.createContext<Realm | null>(null)
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
