@@ -17,7 +17,7 @@ import {
   BannerAdSize
 } from 'react-native-google-mobile-ads'
 
-const adUnitId = TestIds.INTERSTITIAL
+export const adUnitId = TestIds.INTERSTITIAL
 
 const adBannerId = TestIds.BANNER
 
@@ -116,14 +116,6 @@ export default function Index() {
         // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring) // 상태가 바뀌면 자연스레 바꿔준다.
         LayoutAnimation.spring() // 이렇게 써도 됨.
         setFeelings(feel.sorted('_id', false)) // false면 desc, true면 asc
-
-        // ads!
-        interstitial.addAdEventListener(AdEventType.LOADED, () => {
-          interstitial.show()
-        })
-
-        interstitial.load()
-        // ads!
       })
       return () => {
         feelings?.removeAllListeners()
