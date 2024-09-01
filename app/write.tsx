@@ -2,7 +2,7 @@ import { Colors } from '@/constants/Colors'
 import { useContext, useEffect, useState } from 'react'
 import { Alert, Appearance, useColorScheme } from 'react-native'
 import styled from 'styled-components/native'
-import { DBContext } from '@/context/context'
+import { useDB } from '@/context/context'
 
 const colorScheme = Appearance.getColorScheme()
 
@@ -61,7 +61,7 @@ const EmotionText = styled.Text`
 const emotions = ['🤯', '🥲', '🤬', '🤗', '🥰', '😊', '🤩']
 
 export default function Write() {
-  const realm = useContext(DBContext)
+  const realm = useDB()
   useEffect(() => console.log('realm', realm), [])
   const [selectedEmotion, setEmotion] = useState<string | null>(null)
   const [feelings, setFeelings] = useState('')
