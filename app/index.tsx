@@ -8,7 +8,7 @@ const colorScheme = Appearance.getColorScheme()
 
 const View = styled.View`
   flex: 1;
-  padding: 0px 50px;
+  padding: 0px 30px;
   padding-top: 100px;
   background-color: ${Colors[colorScheme ?? 'light'].background};
 `
