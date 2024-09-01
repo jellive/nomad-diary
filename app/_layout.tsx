@@ -24,7 +24,7 @@ const FeelingSchema: Realm.ObjectSchema = {
   primaryKey: '_id'
 }
 
-const Context = React.createContext
+const Context = React.createContext<Realm | null>(null)
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -59,17 +59,21 @@ export default function RootLayout() {
     return null
   }
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      {/* onLayout은 꼭 써줘야 함. */}
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false, presentation: 'modal' }}>
-          {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
+    <Context.Provider value={realm}>
+      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        {/* onLayout은 꼭 써줘야 함. */}
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+          <Stack screenOptions={{ headerShown: false, presentation: 'modal' }}>
+            {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
 
-          <Stack.Screen name="index" />
-          <Stack.Screen name="write" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </ThemeProvider>
-    </View>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="write" />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ThemeProvider>
+      </View>
+    </Context.Provider>
   )
 }
