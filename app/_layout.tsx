@@ -24,6 +24,8 @@ const FeelingSchema: Realm.ObjectSchema = {
   primaryKey: '_id'
 }
 
+const Context = React.createContext
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
 
@@ -42,11 +44,13 @@ export default function RootLayout() {
   }
 
   useEffect(() => {
+    // get
     loadRealm()
   }, [])
   console.log(realm)
 
   const onLayoutRootView = useCallback(async () => {
+    // set
     if (realm && font) await SplashScreen.hideAsync()
   }, [realm, font])
 
