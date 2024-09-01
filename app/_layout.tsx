@@ -14,6 +14,7 @@ import Realm from 'realm'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { View } from 'react-native'
 import { DBContext } from '@/context/context'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 const FeelingSchema: Realm.ObjectSchema = {
   name: 'Feeling',
@@ -58,21 +59,25 @@ export default function RootLayout() {
     return null
   }
   return (
-    <DBContext.Provider value={realm}>
-      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-        {/* onLayout은 꼭 써줘야 함. */}
-        <ThemeProvider
-          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-        >
-          <Stack screenOptions={{ headerShown: false, presentation: 'modal' }}>
-            {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <DBContext.Provider value={realm}>
+        <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+          {/* onLayout은 꼭 써줘야 함. */}
+          <ThemeProvider
+            value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+          >
+            <Stack
+              screenOptions={{ headerShown: false, presentation: 'modal' }}
+            >
+              {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
 
-            <Stack.Screen name="index" />
-            <Stack.Screen name="write" />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-        </ThemeProvider>
-      </View>
-    </DBContext.Provider>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="write" />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </ThemeProvider>
+        </View>
+      </DBContext.Provider>
+    </GestureHandlerRootView>
   )
 }
