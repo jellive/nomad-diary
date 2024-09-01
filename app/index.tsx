@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
-import { Appearance, useColorScheme } from 'react-native'
+import { Appearance, useColorScheme, LayoutAnimation } from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 import styled, { useTheme } from 'styled-components/native'
 
 const colorScheme = Appearance.getColorScheme()
@@ -64,9 +65,11 @@ export default function Index() {
   const realm = useDB()
   const [feelings, setFeelings] = useState(realm?.objects('Feeling'))
   useEffect(() => {
-    feelings?.addListener(() => {
+    feelings?.addListener((feel, changes) => {
       console.log('new feeling change')
-      setFeelings(realm?.objects('Feeling'))
+      // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring) // 상태가 바뀌면 자연스레 바꿔준다.
+      LayoutAnimation.spring() // 이렇게 써도 됨.
+      setFeelings(feel.sorted('_id', false)) // false면 desc, true면 asc
     })
     return () => {
       feelings?.removeAllListeners()
@@ -76,6 +79,13 @@ export default function Index() {
     // const happy = feelings?.filtered(`emotion = '🤯'`)
     // console.log('happy', happy)
   }, [])
+  const removeFeeling = (id: string) => {
+    realm?.write(() => {
+      const feeling = realm.objectForPrimaryKey('Feeling', id)
+      realm.delete(feeling)
+    })
+  }
+
   return (
     <View>
       <Title>Home</Title>
@@ -85,10 +95,12 @@ export default function Index() {
         ItemSeparatorComponent={Separator}
         keyExtractor={feeling => feeling._id + ''}
         renderItem={({ item }) => (
-          <Record>
-            <Emotion>{item.emotion}</Emotion>
-            <Message>{item.message}</Message>
-          </Record>
+          <TouchableOpacity onPress={() => removeFeeling(item._id as string)}>
+            <Record>
+              <Emotion>{item.emotion}</Emotion>
+              <Message>{item.message}</Message>
+            </Record>
+          </TouchableOpacity>
         )}
       />
       <Btn onPress={() => navigation.navigate({ name: 'write' })}>
