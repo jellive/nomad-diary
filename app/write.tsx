@@ -4,10 +4,11 @@ import { Alert, Appearance, useColorScheme } from 'react-native'
 import styled from 'styled-components/native'
 import { useDB } from '@/context/context'
 import { useNavigation } from 'expo-router'
-import { adUnitId, interstitial } from '.'
 import {
   AdEventType,
   InterstitialAd,
+  RewardedAd,
+  RewardedAdEventType,
   TestIds
 } from 'react-native-google-mobile-ads'
 
@@ -93,17 +94,25 @@ export default function Write() {
       console.log(feeling)
 
       // ads!
-      const interstitial = InterstitialAd.createForAdRequest(
-        TestIds.INTERSTITIAL,
-        {
-          keywords: ['fashion', 'clothing']
-        }
-      )
-      interstitial.addAdEventListener(AdEventType.LOADED, () => {
-        interstitial.show()
+      // const interstitial = InterstitialAd.createForAdRequest(
+      //   TestIds.INTERSTITIAL,
+      //   {
+      //     keywords: ['fashion', 'clothing']
+      //   }
+      // )
+      // interstitial.addAdEventListener(AdEventType.LOADED, () => {
+      //   interstitial.show()
+      // })
+
+      // interstitial.load()
+      const reward = RewardedAd.createForAdRequest(TestIds.REWARDED, {
+        keywords: ['fashion', 'game']
+      })
+      reward.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        reward.show()
       })
 
-      interstitial.load()
+      reward.load()
       // ads!
     })
     setEmotion(null)

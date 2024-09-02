@@ -14,7 +14,9 @@ import {
   TestIds,
   BannerAd,
   useForeground,
-  BannerAdSize
+  BannerAdSize,
+  RewardedAd,
+  RewardedAdEventType
 } from 'react-native-google-mobile-ads'
 
 export const adUnitId = TestIds.INTERSTITIAL
@@ -23,6 +25,10 @@ const adBannerId = TestIds.BANNER
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   keywords: ['fashion', 'clothing']
+})
+
+const reward = RewardedAd.createForAdRequest(TestIds.REWARDED, {
+  keywords: ['game']
 })
 // ads!
 
@@ -86,20 +92,20 @@ export default function Index() {
   // ads!
   // interstitial (전체 가로막기)
   const [loaded, setLoaded] = useState(false)
-  useEffect(() => {
-    const unsubscribe = interstitial.addAdEventListener(
-      AdEventType.LOADED,
-      () => {
-        setLoaded(true)
-      }
-    )
+  // useEffect(() => {
+  //   const unsubscribe = interstitial.addAdEventListener(
+  //     AdEventType.LOADED,
+  //     () => {
+  //       setLoaded(true)
+  //     }
+  //   )
 
-    // Start loading the interstitial straight away
-    interstitial.load()
+  //   // Start loading the interstitial straight away
+  //   interstitial.load()
 
-    // Unsubscribe from events on unmount
-    return unsubscribe
-  }, [])
+  //   // Unsubscribe from events on unmount
+  //   return unsubscribe
+  // }, [])
 
   // banner
   const bannerRef = useRef<BannerAd>(null)
@@ -107,24 +113,33 @@ export default function Index() {
     Platform.OS === 'ios' && bannerRef.current?.load()
   })
 
-  const banner =
-    // ads!
-
-    useEffect(() => {
-      feelings?.addListener((feel, changes) => {
-        console.log('new feeling change')
-        // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring) // 상태가 바뀌면 자연스레 바꿔준다.
-        LayoutAnimation.spring() // 이렇게 써도 됨.
-        setFeelings(feel.sorted('_id', false)) // false면 desc, true면 asc
-      })
-      return () => {
-        feelings?.removeAllListeners()
+  useEffect(() => {
+    const unsubscribeEarned = reward.addAdEventListener(
+      RewardedAdEventType.EARNED_REWARD,
+      reward => {
+        console.log('User earned reward of ', reward)
       }
-      // const feelings = realm?.objects('Feeling')
-      // console.log('feelings', feelings)
-      // const happy = feelings?.filtered(`emotion = '🤯'`)
-      // console.log('happy', happy)
-    }, [])
+    )
+    reward.load()
+    return unsubscribeEarned
+  }, [])
+  // ads!
+
+  useEffect(() => {
+    feelings?.addListener((feel, changes) => {
+      console.log('new feeling change')
+      // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring) // 상태가 바뀌면 자연스레 바꿔준다.
+      LayoutAnimation.spring() // 이렇게 써도 됨.
+      setFeelings(feel.sorted('_id', false)) // false면 desc, true면 asc
+    })
+    return () => {
+      feelings?.removeAllListeners()
+    }
+    // const feelings = realm?.objects('Feeling')
+    // console.log('feelings', feelings)
+    // const happy = feelings?.filtered(`emotion = '🤯'`)
+    // console.log('happy', happy)
+  }, [])
   const removeFeeling = (id: string) => {
     realm?.write(() => {
       const feeling = realm.objectForPrimaryKey('Feeling', id)
