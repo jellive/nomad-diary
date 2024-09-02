@@ -4,6 +4,13 @@ import { Alert, Appearance, useColorScheme } from 'react-native'
 import styled from 'styled-components/native'
 import { useDB } from '@/context/context'
 import { useNavigation } from 'expo-router'
+import {
+  AdEventType,
+  InterstitialAd,
+  RewardedAd,
+  RewardedAdEventType,
+  TestIds
+} from 'react-native-google-mobile-ads'
 
 const colorScheme = Appearance.getColorScheme()
 
@@ -85,6 +92,31 @@ export default function Write() {
         message: feelings
       })
       console.log(feeling)
+
+      // ads!
+      // const interstitial = InterstitialAd.createForAdRequest(
+      //   TestIds.INTERSTITIAL,
+      //   {
+      //     keywords: ['fashion', 'clothing']
+      //   }
+      // )
+      // interstitial.addAdEventListener(AdEventType.LOADED, () => {
+      //   interstitial.show()
+      // })
+
+      // interstitial.load()
+      const reward = RewardedAd.createForAdRequest(TestIds.REWARDED, {
+        keywords: ['fashion', 'game']
+      })
+      reward.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        reward.show()
+      })
+      reward.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
+        console.log('reward!')
+      })
+
+      reward.load()
+      // ads!
     })
     setEmotion(null)
     setFeelings('')

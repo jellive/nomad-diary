@@ -2,11 +2,35 @@ import { Colors } from '@/constants/Colors'
 import { useDB } from '@/context/context'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
-import { FlatList } from 'react-native'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Button, FlatList, Platform } from 'react-native'
 import { Appearance, useColorScheme, LayoutAnimation } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import styled, { useTheme } from 'styled-components/native'
+// ads!
+import {
+  InterstitialAd,
+  AdEventType,
+  TestIds,
+  BannerAd,
+  useForeground,
+  BannerAdSize,
+  RewardedAd,
+  RewardedAdEventType
+} from 'react-native-google-mobile-ads'
+
+export const adUnitId = TestIds.INTERSTITIAL
+
+const adBannerId = TestIds.BANNER
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ['fashion', 'clothing']
+})
+
+const reward = RewardedAd.createForAdRequest(TestIds.REWARDED, {
+  keywords: ['game']
+})
+// ads!
 
 const colorScheme = Appearance.getColorScheme()
 
@@ -64,6 +88,43 @@ export default function Index() {
   const navigation = useNavigation()
   const realm = useDB()
   const [feelings, setFeelings] = useState(realm?.objects('Feeling'))
+
+  // ads!
+  // interstitial (전체 가로막기)
+  const [loaded, setLoaded] = useState(false)
+  // useEffect(() => {
+  //   const unsubscribe = interstitial.addAdEventListener(
+  //     AdEventType.LOADED,
+  //     () => {
+  //       setLoaded(true)
+  //     }
+  //   )
+
+  //   // Start loading the interstitial straight away
+  //   interstitial.load()
+
+  //   // Unsubscribe from events on unmount
+  //   return unsubscribe
+  // }, [])
+
+  // banner
+  const bannerRef = useRef<BannerAd>(null)
+  useForeground(() => {
+    Platform.OS === 'ios' && bannerRef.current?.load()
+  })
+
+  // useEffect(() => {
+  //   const unsubscribeEarned = reward.addAdEventListener(
+  //     RewardedAdEventType.EARNED_REWARD,
+  //     reward => {
+  //       console.log('User earned reward of ', reward)
+  //     }
+  //   )
+  //   reward.load()
+  //   return unsubscribeEarned
+  // }, [])
+  // ads!
+
   useEffect(() => {
     feelings?.addListener((feel, changes) => {
       console.log('new feeling change')
@@ -89,6 +150,13 @@ export default function Index() {
   return (
     <View>
       <Title>Home</Title>
+
+      <BannerAd
+        ref={bannerRef}
+        unitId={adBannerId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
+
       <FlatList
         data={feelings}
         contentContainerStyle={{ paddingVertical: 10 }}
@@ -103,9 +171,19 @@ export default function Index() {
           </TouchableOpacity>
         )}
       />
+
       <Btn onPress={() => navigation.navigate({ name: 'write' })}>
         <Ionicons name="add" color="white" size={40} />
       </Btn>
+
+      {/* ads! */}
+      <Button
+        title="Show Interstitial"
+        onPress={() => {
+          interstitial.show()
+        }}
+      />
+      {/* ads! */}
     </View>
   )
 }
