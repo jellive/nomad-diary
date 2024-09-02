@@ -113,16 +113,16 @@ export default function Index() {
     Platform.OS === 'ios' && bannerRef.current?.load()
   })
 
-  useEffect(() => {
-    const unsubscribeEarned = reward.addAdEventListener(
-      RewardedAdEventType.EARNED_REWARD,
-      reward => {
-        console.log('User earned reward of ', reward)
-      }
-    )
-    reward.load()
-    return unsubscribeEarned
-  }, [])
+  // useEffect(() => {
+  //   const unsubscribeEarned = reward.addAdEventListener(
+  //     RewardedAdEventType.EARNED_REWARD,
+  //     reward => {
+  //       console.log('User earned reward of ', reward)
+  //     }
+  //   )
+  //   reward.load()
+  //   return unsubscribeEarned
+  // }, [])
   // ads!
 
   useEffect(() => {

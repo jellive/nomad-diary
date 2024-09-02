@@ -111,6 +111,9 @@ export default function Write() {
       reward.addAdEventListener(RewardedAdEventType.LOADED, () => {
         reward.show()
       })
+      reward.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
+        console.log('reward!')
+      })
 
       reward.load()
       // ads!
